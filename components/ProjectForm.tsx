@@ -1,5 +1,6 @@
 import { Project, ProjectStatus } from "@prisma/client";
 import LocationPicker from "@/components/LocationPicker";
+import { projectProgress } from "@/lib/progress";
 
 export default function ProjectForm({
   action,
@@ -41,7 +42,7 @@ export default function ProjectForm({
         </div>
         <div className="field">
           <label htmlFor="physicalAccomplishment">Physical accomplishment (%)</label>
-          <input className="input" id="physicalAccomplishment" name="physicalAccomplishment" type="number" inputMode="numeric" min="0" max="100" defaultValue={project?.physicalAccomplishment ?? 0} required />
+          <input className="input" id="physicalAccomplishment" name="physicalAccomplishment" type="number" inputMode="decimal" step="0.01" min="0" max="100" defaultValue={project ? projectProgress(project) : 0} required />
         </div>
 
         <details className="formDetails full" open={Boolean(project && (project.projectEngineer || project.projectInspector || project.materialsEngineer || project.laboratoryTechnician))}>

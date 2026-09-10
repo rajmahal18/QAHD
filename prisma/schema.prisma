@@ -50,6 +50,7 @@ model Project {
   materialsEngineer      String?
   laboratoryTechnician   String?
   physicalAccomplishment Int           @default(0)
+  physicalAccomplishmentDecimal Decimal? @db.Decimal(5, 2)
   status                 ProjectStatus @default(ONGOING)
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @updatedAt

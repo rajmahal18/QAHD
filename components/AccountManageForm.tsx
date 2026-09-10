@@ -1,5 +1,7 @@
 "use client";
 
+import PasswordInput from "@/components/PasswordInput";
+
 import { FormEvent, useState } from "react";
 
 type Account = {
@@ -101,11 +103,11 @@ export default function AccountManageForm({ account, isSelf }: { account: Accoun
         <div className="formGrid">
           <div className="field">
             <label htmlFor="password">Temporary password</label>
-            <input className="input" id="password" name="password" type="password" minLength={10} autoComplete="new-password" required />
+            <PasswordInput className="input" id="password" name="password" minLength={10} autoComplete="new-password" required />
           </div>
           <div className="field">
             <label htmlFor="confirmPassword">Confirm temporary password</label>
-            <input className="input" id="confirmPassword" name="confirmPassword" type="password" minLength={10} autoComplete="new-password" required />
+            <PasswordInput className="input" id="confirmPassword" name="confirmPassword" minLength={10} autoComplete="new-password" required />
           </div>
         </div>
         <div className="formActions"><button className="button secondary" type="submit" disabled={resetBusy}>{resetBusy ? "Resetting…" : "Set temporary password"}</button></div>

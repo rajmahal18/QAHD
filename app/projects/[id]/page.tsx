@@ -1,3 +1,4 @@
+import { projectProgress } from "@/lib/progress";
 import ListControls from "@/components/ListControls";
 import { pagination } from "@/lib/pagination";
 import { Prisma, TestResult } from "@prisma/client";
@@ -106,7 +107,7 @@ export default async function ProjectPage({
 
         <div className="summaryGrid four">
           <div className="card summaryBox"><span>Status</span><strong><span className={`badge ${project.status}`}>{humanizeEnum(project.status)}</span></strong></div>
-          <div className="card summaryBox"><span>Physical accomplishment</span><strong>{project.physicalAccomplishment}%</strong></div>
+          <div className="card summaryBox"><span>Physical accomplishment</span><strong>{projectProgress(project)}%</strong></div>
           <div className="card summaryBox"><span>Tests recorded</span><strong>{totalTests}</strong></div>
           <div className="card summaryBox"><span>Needs attention</span><strong>{failedTests + pendingTests}</strong></div>
         </div>

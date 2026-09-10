@@ -1,5 +1,7 @@
 "use client";
 
+import PasswordInput from "@/components/PasswordInput";
+
 import { FormEvent, useState } from "react";
 
 export default function ChangePasswordForm() {
@@ -38,15 +40,15 @@ export default function ChangePasswordForm() {
       <div className="formGrid">
         <div className="field full">
           <label htmlFor="currentPassword">Current password</label>
-          <input className="input" id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" required />
+          <PasswordInput className="input" id="currentPassword" name="currentPassword" autoComplete="current-password" required />
         </div>
         <div className="field">
           <label htmlFor="newPassword">New password</label>
-          <input className="input" id="newPassword" name="newPassword" type="password" minLength={10} autoComplete="new-password" required />
+          <PasswordInput className="input" id="newPassword" name="newPassword" minLength={10} autoComplete="new-password" required />
         </div>
         <div className="field">
           <label htmlFor="confirmPassword">Confirm new password</label>
-          <input className="input" id="confirmPassword" name="confirmPassword" type="password" minLength={10} autoComplete="new-password" required />
+          <PasswordInput className="input" id="confirmPassword" name="confirmPassword" minLength={10} autoComplete="new-password" required />
         </div>
       </div>
       <div className="formActions"><button className="button" type="submit" disabled={busy}>{busy ? "Changing…" : "Change password"}</button></div>

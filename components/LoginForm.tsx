@@ -1,5 +1,7 @@
 "use client";
 
+import PasswordInput from "@/components/PasswordInput";
+
 import { FormEvent, useState } from "react";
 
 export default function LoginForm() {
@@ -37,7 +39,7 @@ export default function LoginForm() {
       </div>
       <div className="field">
         <label htmlFor="password">Password</label>
-        <input className="input" id="password" name="password" type="password" autoComplete="current-password" required />
+        <PasswordInput className="input" id="password" name="password" autoComplete="current-password" required />
       </div>
       <button className="button" type="submit" disabled={loading}>{loading ? "Signing in…" : "Sign in"}</button>
     </form>

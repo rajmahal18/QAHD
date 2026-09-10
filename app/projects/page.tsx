@@ -1,3 +1,4 @@
+import { projectProgress } from "@/lib/progress";
 import ListControls from "@/components/ListControls";
 import { pagination } from "@/lib/pagination";
 import { Prisma, ProjectStatus } from "@prisma/client";
@@ -77,8 +78,8 @@ export default async function ProjectsPage({
                   <span>{project._count.items} item{project._count.items === 1 ? "" : "s"}</span>
                 </div>
                 <div className="progressWrap">
-                  <div className="progressMeta"><span>Physical accomplishment</span><span>{project.physicalAccomplishment}%</span></div>
-                  <div className="progressTrack"><div className="progressFill" style={{ width: `${project.physicalAccomplishment}%` }} /></div>
+                  <div className="progressMeta"><span>Physical accomplishment</span><span>{projectProgress(project)}%</span></div>
+                  <div className="progressTrack"><div className="progressFill" style={{ width: `${projectProgress(project)}%` }} /></div>
                 </div>
               </a>
             ))}

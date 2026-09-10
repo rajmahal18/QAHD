@@ -119,6 +119,12 @@ Keep the bucket private.
 
 ## Deployment
 
+### Decimal progress
+
+Physical accomplishment accepts 0–100 with up to two decimal places (for example, 42.75%). Before deploying this change, run `npm run db:upgrade-progress` against the target database, then build/deploy normally. This idempotent upgrade adds a nullable `DECIMAL(5,2)` column and a compatibility trigger; it does not replace the existing integer column or rewrite existing records.
+
+The app reads the decimal value when available and otherwise uses the existing integer value. Saves retain a rounded integer for older deployments. If an older deployment changes that integer, the trigger clears the stale decimal so the updated value remains visible. Older deployments display whole percentages. Do not remove the legacy column during rollout. `db:push` alone does not install the compatibility trigger.
+
 The repo includes:
 
 ```json
