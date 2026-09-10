@@ -34,33 +34,42 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
   return (
     <>
       <AppHeader />
-      <main className="shell">
+      <main className="shell appMain">
         <a className="backLink" href={itemHref}>← Item {test.item.itemNumber}</a>
-        <div className="pageTop">
-          <div>
+        <section className="pageHero compactHero">
+          <div className="heroCopy">
             <div className="eyebrow">{primaryLabel} {formatDate(primaryDate)}</div>
             <h1>{test.testName}</h1>
             <p>{test.item.project.projectCode} · {test.item.description}</p>
+            <div className="heroMetaChips">
+              <span>{humanizeEnum(test.result)}</span>
+              <span>{test.attachments.length} attachment{test.attachments.length === 1 ? "" : "s"}</span>
+              <span>{test.item.project.location || "Location not set"}</span>
+            </div>
           </div>
-          <div className="pageActions">
-            <span className={`badge ${test.result}`}>{humanizeEnum(test.result)}</span>
-            {canEditTests(user) ? <a className="button secondary" href={`/tests/${test.id}/edit`}>Edit</a> : null}
-            {canEditTests(user) ? <a className="button" href={repeatHref}>Record again</a> : null}
+          <div className="heroActions">
+            <div className="pageActions">
+              <span className={`badge ${test.result}`}>{humanizeEnum(test.result)}</span>
+              {canEditTests(user) ? <a className="button secondary" href={`/tests/${test.id}/edit`}>Edit</a> : null}
+              {canEditTests(user) ? <a className="button" href={repeatHref}>Record again</a> : null}
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="card infoCard">
-          <div className="testDateSummary">
-            <div className="infoItem"><span>Date Sampled</span><strong>{shownDate(test.dateSampled)}</strong></div>
-            <div className="infoItem"><span>Date Submitted</span><strong>{shownDate(test.dateSubmitted)}</strong></div>
-            <div className="infoItem"><span>Date Tested</span><strong>{shownDate(test.dateTested)}</strong></div>
+        <section className="section firstSection">
+          <div className="card infoCard">
+            <div className="testDateSummary">
+              <div className="infoItem"><span>Date Sampled</span><strong>{shownDate(test.dateSampled)}</strong></div>
+              <div className="infoItem"><span>Date Submitted</span><strong>{shownDate(test.dateSubmitted)}</strong></div>
+              <div className="infoItem"><span>Date Tested</span><strong>{shownDate(test.dateTested)}</strong></div>
+            </div>
+            <div className="infoGrid testMetaGrid">
+              <div className="infoItem"><span>Recorded by</span><strong>{test.createdBy.displayName}</strong></div>
+              <div className="infoItem"><span>Project location</span><strong>{test.item.project.location || "—"}</strong></div>
+              <div className="infoItem fullInfo"><span>Remarks</span><strong>{test.remarks || "—"}</strong></div>
+            </div>
           </div>
-          <div className="infoGrid testMetaGrid">
-            <div className="infoItem"><span>Recorded by</span><strong>{test.createdBy.displayName}</strong></div>
-            <div className="infoItem"><span>Project location</span><strong>{test.item.project.location || "—"}</strong></div>
-            <div className="infoItem fullInfo"><span>Remarks</span><strong>{test.remarks || "—"}</strong></div>
-          </div>
-        </div>
+        </section>
 
         <section className="section">
           <div className="sectionHeader"><div><h2>Evidence</h2><p>Photos and PDF test results.</p></div></div>

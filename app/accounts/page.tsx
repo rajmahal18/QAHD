@@ -25,36 +25,57 @@ export default async function AccountsPage() {
     },
   });
 
+  const active = accounts.filter((account) => account.isActive).length;
+  const pendingPassword = accounts.filter((account) => account.mustChangePassword).length;
+  const admins = accounts.filter((account) => account.role === UserRole.ADMIN).length;
+
   return (
     <>
       <AppHeader />
-      <main className="shell">
+      <main className="shell appMain">
         <a className="backLink" href="/projects">← Projects</a>
-        <div className="pageTop">
-          <div>
+        <section className="pageHero compactHero">
+          <div className="heroCopy">
             <div className="eyebrow">Administration</div>
             <h1>Accounts</h1>
-            <p>{accounts.length} account{accounts.length === 1 ? "" : "s"}. Keep access simple and controlled.</p>
+            <p>Keep access simple, visible, and controlled. No unnecessary role sprawl.</p>
           </div>
-          <div className="pageActions"><a className="button" href="/accounts/new">+ Add account</a></div>
-        </div>
+          <div className="heroActions"> 
+            <a className="button" href="/accounts/new">+ Add account</a>
+          </div>
+        </section>
 
-        <div className="list accountList">
-          {accounts.map((account) => (
-            <a className="card accountRow" href={`/accounts/${account.id}`} key={account.id}>
-              <div className="rowTitle">
-                <strong>{account.displayName}</strong>
-                <span>@{account.username}</span>
-              </div>
-              <div className="accountRowStatus">
-                <span className={`badge ${account.isActive ? "ACTIVE" : "INACTIVE"}`}>{account.isActive ? "Active" : "Inactive"}</span>
-                <span className="badge roleBadge">{roleLabel(account)}</span>
-                {account.mustChangePassword ? <span className="badge PENDING">Password change</span> : null}
-                <span className="chevron" aria-hidden="true">›</span>
-              </div>
-            </a>
-          ))}
-        </div>
+        <section className="kpiGrid section firstSection">
+          <div className="card kpiCard accent-blue"><span className="kpiLabel">Total accounts</span><strong>{accounts.length}</strong><small>Current users in the system</small></div>
+          <div className="card kpiCard accent-gold"><span className="kpiLabel">Active</span><strong>{active}</strong><small>{accounts.length - active} inactive</small></div>
+          <div className="card kpiCard accent-orange"><span className="kpiLabel">Password change required</span><strong>{pendingPassword}</strong><small>Users with temporary passwords</small></div>
+          <div className="card kpiCard accent-slate"><span className="kpiLabel">Administrators</span><strong>{admins}</strong><small>Accounts with admin access</small></div>
+        </section>
+
+        <section className="section">
+          <div className="sectionHeader sectionHeaderSpacious">
+            <div>
+              <h2>Account list</h2>
+              <p>Open an account to edit the name, role, active status, or reset its password.</p>
+            </div>
+          </div>
+          <div className="list accountList accountListPremium">
+            {accounts.map((account) => (
+              <a className="card accountRow accountRowPremium" href={`/accounts/${account.id}`} key={account.id}>
+                <div className="rowTitle">
+                  <strong>{account.displayName}</strong>
+                  <span>@{account.username}</span>
+                </div>
+                <div className="accountRowStatus">
+                  <span className={`badge ${account.isActive ? "ACTIVE" : "INACTIVE"}`}>{account.isActive ? "Active" : "Inactive"}</span>
+                  <span className="badge roleBadge">{roleLabel(account)}</span>
+                  {account.mustChangePassword ? <span className="badge PENDING">Password change</span> : null}
+                  <span className="chevron" aria-hidden="true">›</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
       </main>
     </>
   );

@@ -25,9 +25,7 @@ export default async function ProjectPage({
   const { id } = await params;
   const { notice = "", q = "", page: requestedPage } = await searchParams;
 
-  const project = await prisma.project.findUnique({
-    where: { id },
-  });
+  const project = await prisma.project.findUnique({ where: { id } });
   if (!project) notFound();
 
   const where: Prisma.ProjectItemWhereInput = { projectId: id };
@@ -38,10 +36,16 @@ export default async function ProjectPage({
   const total = await prisma.projectItem.count({ where });
   const { page, skip, take } = pagination(requestedPage, total);
   const items = await prisma.projectItem.findMany({
-    where, skip, take, orderBy: [{ itemNumber: "asc" }, { id: "asc" }],
-    select: { id: true, itemNumber: true, description: true,
+    where,
+    skip,
+    take,
+    orderBy: [{ itemNumber: "asc" }, { id: "asc" }],
+    select: {
+      id: true,
+      itemNumber: true,
+      description: true,
       _count: { select: { tests: true } },
-      tests: { orderBy: [{ conductedAt: "desc" }, { createdAt: "desc" }], take: 1, select: { conductedAt: true } },
+      tests: { orderBy: [{ conductedAt: "desc" }, { createdAt: "desc" }], take: 1, select: { conductedAt: true, result: true } },
     },
   });
   const testWhere: Prisma.TestWhereInput = { item: { projectId: project.id } };
@@ -71,22 +75,44 @@ export default async function ProjectPage({
     description: item.description,
     testCount: item._count.tests,
     lastTest: item.tests[0] ? formatDate(item.tests[0].conductedAt) : null,
+    lastResult: item.tests[0]?.result || null,
   }));
+
+  const progress = projectProgress(project);
 
   return (
     <>
       <AppHeader />
-      <main className="shell">
-        <a className="backLink" href="/projects">← Projects</a>
-        <div className="pageTop">
-          <div>
+      <main className="shell appMain">
+        <a className="backLink" href="/projects">← Project registry</a>
+
+        <section className="pageHero detailHero">
+          <div className="heroCopy">
             <div className="eyebrow">{project.projectCode}</div>
             <h1>{project.name}</h1>
-            <div className="projectLocationLine">
-              <span>{project.location || "Location not set"} · {project.contractor}</span>
+            <p>{project.contractor}</p>
+            <div className="heroMetaChips">
+              <span>{project.location || "Location not set"}</span>
+              <span>{total} item{total === 1 ? "" : "s"}</span>
+              <span>{totalTests} tests recorded</span>
+            </div>
+          </div>
+          <div className="heroAside card statusPanel">
+            <div className="statusPanelHead">
+              <span className={`badge ${project.status}`}>{humanizeEnum(project.status)}</span>
+              <strong>{progress}%</strong>
+            </div>
+            <div className="progressWrap compact">
+              <div className="progressMeta"><span>Physical accomplishment</span><span>{progress}%</span></div>
+              <div className="progressTrack">
+                <div className="progressFill" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+            <div className="heroAsideActions">
+              <a className="button secondary" href={`/api/projects/${project.id}/export`}>Export CSV</a>
               {project.location ? (
                 <a
-                  className="mapLink"
+                  className="button secondary"
                   href={project.latitude !== null && project.longitude !== null
                     ? `https://www.google.com/maps/search/?api=1&query=${project.latitude},${project.longitude}`
                     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.location)}`}
@@ -96,45 +122,92 @@ export default async function ProjectPage({
                   Open in Google Maps ↗
                 </a>
               ) : null}
+              {canManageProjects(user) ? <a className="button" href={`/projects/${project.id}/edit`}>Edit project</a> : null}
             </div>
           </div>
-          <div className="pageActions">
-            <a className="button secondary" href={`/api/projects/${project.id}/export`}>Export CSV</a>
-            {canManageProjects(user) ? <a className="button secondary" href={`/projects/${project.id}/edit`}>Edit project</a> : null}
-          </div>
-        </div>
+        </section>
 
         {notice ? <div className="noticeBox successNotice">{notice}</div> : null}
 
-        <div className="summaryGrid four">
-          <div className="card summaryBox"><span>Status</span><strong><span className={`badge ${project.status}`}>{humanizeEnum(project.status)}</span></strong></div>
-          <div className="card summaryBox"><span>Physical accomplishment</span><strong>{projectProgress(project)}%</strong></div>
-          <div className="card summaryBox"><span>Tests recorded</span><strong>{totalTests}</strong></div>
-          <div className="card summaryBox"><span>Needs attention</span><strong>{failedTests + pendingTests}</strong></div>
-        </div>
+        <section className="kpiGrid section firstSection">
+          <div className="card kpiCard accent-blue">
+            <span className="kpiLabel">Status</span>
+            <strong>{humanizeEnum(project.status)}</strong>
+            <small>Current project monitoring state</small>
+          </div>
+          <div className="card kpiCard accent-gold">
+            <span className="kpiLabel">Tests recorded</span>
+            <strong>{totalTests}</strong>
+            <small>{pendingTests} pending · {failedTests} failed</small>
+          </div>
+          <div className="card kpiCard accent-orange">
+            <span className="kpiLabel">Needs attention</span>
+            <strong>{failedTests + pendingTests}</strong>
+            <small>Auto-surfaced from failed and pending tests</small>
+          </div>
+          <div className="card kpiCard accent-slate">
+            <span className="kpiLabel">Project team</span>
+            <strong>{[project.projectEngineer, project.projectInspector, project.materialsEngineer, project.laboratoryTechnician].filter(Boolean).length}</strong>
+            <small>Assigned staff fields filled in</small>
+          </div>
+        </section>
 
-        {attentionTests.length ? (
-          <section className="section attentionSection">
-            <div className="sectionHeader"><div><h2>Needs attention</h2><p>{failedTests + pendingTests > 5 ? `Latest 5 of ${failedTests + pendingTests} failed or pending tests.` : "Failed or pending tests, surfaced automatically."}</p></div></div>
-            <div className="list compactList">
-              {attentionTests.map((test) => (
-                <a className="card attentionRow" href={`/tests/${test.id}`} key={test.id}>
-                  <div className="rowTitle"><strong>{test.testName}</strong><span>Item {test.item.itemNumber} · {formatDate(test.conductedAt)}</span></div>
-                  <span className={`badge ${test.result}`}>{humanizeEnum(test.result)}</span>
-                </a>
-              ))}
+        <section className="section twoColumnOverview">
+          <div className="card infoCard">
+            <div className="sectionHeader compactHeader">
+              <div>
+                <h2>Overview</h2>
+                <p>Core project details kept visible without overloading the page.</p>
+              </div>
             </div>
-          </section>
-        ) : null}
+            <div className="infoGrid overviewGrid">
+              <div className="infoItem"><span>Contractor / Implementor</span><strong>{project.contractor || "—"}</strong></div>
+              <div className="infoItem"><span>Location</span><strong>{project.location || "—"}</strong></div>
+              <div className="infoItem"><span>Project Engineer</span><strong>{project.projectEngineer || "—"}</strong></div>
+              <div className="infoItem"><span>Project Inspector</span><strong>{project.projectInspector || "—"}</strong></div>
+              <div className="infoItem"><span>Materials Engineer</span><strong>{project.materialsEngineer || "—"}</strong></div>
+              <div className="infoItem"><span>Laboratory Technician</span><strong>{project.laboratoryTechnician || "—"}</strong></div>
+            </div>
+          </div>
+
+          {attentionTests.length ? (
+            <div className="card infoCard sideAttentionCard">
+              <div className="sectionHeader compactHeader">
+                <div>
+                  <h2>Needs attention</h2>
+                  <p>{failedTests + pendingTests > 5 ? `Latest 5 of ${failedTests + pendingTests} attention items.` : "Failed or pending tests surfaced automatically."}</p>
+                </div>
+              </div>
+              <div className="list compactList">
+                {attentionTests.map((test) => (
+                  <a className="attentionMiniRow" href={`/tests/${test.id}`} key={test.id}>
+                    <div>
+                      <strong>{test.testName}</strong>
+                      <span>Item {test.item.itemNumber} · {formatDate(test.conductedAt)}</span>
+                    </div>
+                    <span className={`badge ${test.result}`}>{humanizeEnum(test.result)}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </section>
 
         <section className="section">
-          <div className="sectionHeader"><div><h2>Items</h2><p>Open an item to record or review its tests.</p></div></div>
-          <ListControls page={page} total={total} placeholder="Find an item" />
+          <div className="sectionHeader sectionHeaderSpacious">
+            <div>
+              <h2>Items</h2>
+              <p>Open an item to record, search, and review its tests.</p>
+            </div>
+          </div>
+          <div className="card filterPanel">
+            <ListControls page={page} total={total} placeholder="Find an item number or description" />
+          </div>
           <ProjectItemList projectId={project.id} items={itemRows} />
 
           {canManageProjects(user) ? (
             <div className="itemEntryStack section">
-              <form className="card inlineForm" action={addItem}>
+              <form className="card inlineForm inlineFormPremium" action={addItem}>
                 <div className="field"><label htmlFor="itemNumber">Item No.</label><input className="input" id="itemNumber" name="itemNumber" placeholder="e.g. 200" autoComplete="off" required /></div>
                 <div className="field"><label htmlFor="description">Description</label><input className="input" id="description" name="description" placeholder="e.g. Aggregate Base Course" autoComplete="off" required /></div>
                 <button className="button" type="submit">+ Add item</button>
@@ -155,16 +228,6 @@ export default async function ProjectPage({
             </div>
           ) : null}
         </section>
-
-        <details className="card detailsPanel section">
-          <summary>Project team</summary>
-          <div className="detailsBody infoGrid">
-            <div className="infoItem"><span>Project Engineer</span><strong>{project.projectEngineer || "—"}</strong></div>
-            <div className="infoItem"><span>Project Inspector</span><strong>{project.projectInspector || "—"}</strong></div>
-            <div className="infoItem"><span>Materials Engineer</span><strong>{project.materialsEngineer || "—"}</strong></div>
-            <div className="infoItem"><span>Laboratory Technician</span><strong>{project.laboratoryTechnician || "—"}</strong></div>
-          </div>
-        </details>
       </main>
     </>
   );

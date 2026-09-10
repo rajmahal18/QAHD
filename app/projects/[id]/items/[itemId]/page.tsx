@@ -82,29 +82,50 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
   return (
     <>
       <AppHeader />
-      <main className="shell">
+      <main className="shell appMain">
         <a className="backLink" href={`/projects/${item.project.id}`}>← {item.project.projectCode}</a>
-        <div className="pageTop">
-          <div>
+        <section className="pageHero compactHero">
+          <div className="heroCopy">
             <div className="eyebrow">Item {item.itemNumber}</div>
             <h1>{item.description}</h1>
-            <p>{item.project.name} · {item.project.location || "Location not set"}</p>
+            <p>{item.project.name}</p>
+            <div className="heroMetaChips">
+              <span>{item.project.location || "Location not set"}</span>
+              <span>{total} matching test{total === 1 ? "" : "s"}</span>
+            </div>
           </div>
-          <div className="pageActions">
-            {canManageProjects(user) ? <a className="button secondary" href={`/projects/${item.project.id}/items/${item.id}/edit`}>Edit item</a> : null}
-            {canEditTests(user) ? <a className="button" href={`/projects/${item.project.id}/items/${item.id}/tests/new`}>+ Add test</a> : null}
+          <div className="heroActions">
+            <div className="pageActions">
+              {canManageProjects(user) ? <a className="button secondary" href={`/projects/${item.project.id}/items/${item.id}/edit`}>Edit item</a> : null}
+              {canEditTests(user) ? <a className="button" href={`/projects/${item.project.id}/items/${item.id}/tests/new`}>+ Add test</a> : null}
+            </div>
           </div>
-        </div>
+        </section>
 
         <section className="section firstSection">
-          <div className="sectionHeader"><div><h2>Tests conducted</h2><p>Newest activity first. Search any test name, remark, or date.</p></div></div>
           <div className="testSummary" aria-label="Test summary">
             <strong>{groups.reduce((sum, group) => sum + group._count, 0)} tests</strong>
-            <span>{counts.PASSED || 0} passed</span><span className="summaryAlert">{counts.FAILED || 0} failed</span><span className="summaryPending">{counts.PENDING || 0} pending</span>
+            <span>{counts.PASSED || 0} passed</span>
+            <span className="summaryAlert">{counts.FAILED || 0} failed</span>
+            <span className="summaryPending">{counts.PENDING || 0} pending</span>
           </div>
-          <ListControls page={page} total={total} placeholder="Find a test, remark, or date" filter={{ name: "result", label: "Filter test result", options: [
-            { value: "", label: "All results" }, { value: "FAILED", label: "Failed" }, { value: "PENDING", label: "Pending" }, { value: "PASSED", label: "Passed" },
-          ] }} />
+          <div className="card filterPanel">
+            <ListControls
+              page={page}
+              total={total}
+              placeholder="Find a test name, remark, or date"
+              filter={{
+                name: "result",
+                label: "Filter test result",
+                options: [
+                  { value: "", label: "All results" },
+                  { value: "FAILED", label: "Failed" },
+                  { value: "PENDING", label: "Pending" },
+                  { value: "PASSED", label: "Passed" },
+                ],
+              }}
+            />
+          </div>
           <TestList tests={tests} />
         </section>
       </main>

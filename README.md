@@ -151,3 +151,9 @@ The repo includes:
 in `vercel.json` so Vercel functions are pinned to Singapore.
 
 Run the safe database upgrade against production **before** sending production traffic to the v0.5 build. Vercel build already runs `prisma generate` through the existing build script.
+
+## v0.7 reference-faithful UI refresh
+
+This build implements the approved premium desktop reference as the application shell while preserving the existing QAH workflow. It adds the navy left navigation, branded top bar, project KPI strip, municipality/status/search controls, sort and list/grid views, richer project rows, evidence-backed thumbnails when available, numeric pagination, and responsive mobile navigation. Read-only Test Records, Locations, Contractors, Reports, and References indexes support the sidebar without adding new database tables or migrations.
+
+No database schema change is required for v0.7. Existing project, account, test, evidence, R2, and import data remain unchanged.

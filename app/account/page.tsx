@@ -15,15 +15,15 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <AppHeader />
-      <main className="shell narrowShell">
+      <main className="shell narrowShell appMain">
         <a className="backLink" href="/projects">← Projects</a>
-        <div className="pageTop">
-          <div>
+        <section className="pageHero compactHero">
+          <div className="heroCopy">
             <div className="eyebrow">My account</div>
             <h1>{user.displayName}</h1>
             <p>@{user.username} · {roleLabel(user)}</p>
           </div>
-        </div>
+        </section>
 
         {changed ? <div className="noticeBox successNotice">Password changed successfully.</div> : null}
 
@@ -35,6 +35,18 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         ) : null}
 
         <section className="section firstSection">
+          <div className="card infoCard singleInfoCard">
+            <div className="sectionHeader compactHeader"><div><h2>Account details</h2><p>Basic access information for this account.</p></div></div>
+            <div className="infoGrid overviewGrid">
+              <div className="infoItem"><span>Display name</span><strong>{user.displayName}</strong></div>
+              <div className="infoItem"><span>Username</span><strong>@{user.username}</strong></div>
+              <div className="infoItem"><span>Role</span><strong>{roleLabel(user)}</strong></div>
+              <div className="infoItem"><span>Password status</span><strong>{mustChange ? "Must change password" : "Active"}</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section">
           <div className="sectionHeader"><div><h2>Change password</h2><p>Your username stays the same.</p></div></div>
           <ChangePasswordForm />
         </section>

@@ -19,12 +19,19 @@ export default function TestList({ tests }: { tests: TestRow[] }) {
           {tests.map((test) => (
             <a className="card testRow" href={`/tests/${test.id}`} key={test.id}>
               <div className="rowTop">
-                <div className="rowTitle"><strong>{test.testName}</strong><span>{test.date}</span></div>
-                <span className={`badge ${test.result}`}>{label(test.result)}</span>
+                <div className="rowTitle">
+                  <span className="rowKicker">Test record</span>
+                  <strong>{test.testName}</strong>
+                  <span>{test.date}</span>
+                </div>
+                <div className="rowAside">
+                  <span className={`badge ${test.result}`}>{label(test.result)}</span>
+                  <span className="chevron">›</span>
+                </div>
               </div>
               <div className="rowMeta">
                 <span>{test.attachmentCount} attachment{test.attachmentCount === 1 ? "" : "s"}</span>
-                {test.remarks ? <span>{test.remarks.length > 100 ? `${test.remarks.slice(0, 100)}…` : test.remarks}</span> : null}
+                {test.remarks ? <span>{test.remarks.length > 100 ? `${test.remarks.slice(0, 100)}…` : test.remarks}</span> : <span>No remarks</span>}
               </div>
             </a>
           ))}
