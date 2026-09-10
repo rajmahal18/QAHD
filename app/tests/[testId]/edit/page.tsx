@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import TestForm from "@/components/TestForm";
@@ -8,6 +9,7 @@ import { dateInputValue } from "@/lib/format";
 export default async function EditTestPage({ params }: { params: Promise<{ testId: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (!canEditTests(user)) redirect("/projects");
   const { testId } = await params;
 
   const test = await prisma.test.findUnique({

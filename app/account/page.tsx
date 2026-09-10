@@ -1,8 +1,8 @@
+import { roleLabel } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 import { getCurrentUser } from "@/lib/auth";
-import { humanizeEnum } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <div>
             <div className="eyebrow">My account</div>
             <h1>{user.displayName}</h1>
-            <p>@{user.username} · {humanizeEnum(user.role)}</p>
+            <p>@{user.username} · {roleLabel(user)}</p>
           </div>
         </div>
 

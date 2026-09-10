@@ -1,3 +1,4 @@
+import { canManageProjects } from "@/lib/permissions";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import ProjectForm from "@/components/ProjectForm";
@@ -8,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 export default async function EditProjectPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") redirect("/projects");
+  if (!canManageProjects(user)) redirect("/projects");
   const { id } = await params;
   const { error = "" } = await searchParams;
   const project = await prisma.project.findUnique({ where: { id } });

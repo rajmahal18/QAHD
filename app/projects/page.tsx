@@ -1,3 +1,4 @@
+import { canManageProjects } from "@/lib/permissions";
 import { projectProgress } from "@/lib/progress";
 import ListControls from "@/components/ListControls";
 import { pagination } from "@/lib/pagination";
@@ -54,7 +55,7 @@ export default async function ProjectsPage({
             <h1>Projects</h1>
             <p>Find a project, open an item, record the test. Nothing extra.</p>
           </div>
-          {user.role === "ADMIN" ? <a className="button" href="/projects/new">+ Add project</a> : null}
+          {canManageProjects(user) ? <a className="button" href="/projects/new">+ Add project</a> : null}
         </div>
 
         <ListControls page={page} total={total} placeholder="Search project, location, contractor, or staff" filter={{ name: "status", label: "Filter project status", options: [

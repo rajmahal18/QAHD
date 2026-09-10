@@ -119,6 +119,21 @@ Keep the bucket private.
 
 ## Deployment
 
+### Access roles
+
+| Role | Projects, progress, items | Tests and attachments | Accounts |
+| --- | --- | --- | --- |
+| Administrator | Add/edit | Add/edit/upload/remove | Manage |
+| Editor | Add/edit | Add/edit/upload/remove | No access |
+| Encoder | View | Add/edit/upload/remove | No access |
+| Viewer | View | View only | No access |
+
+All active roles can view/export project reports and change their own password. Test editing applies to all tests, not only records created by the current user.
+
+Run `npm run db:upgrade-roles` before deploying this build. It adds a nullable `User.accessLevel` column without changing the existing `ADMIN`/`USER` enum or any account assignments. Existing regular users retain Encoder access. Administrators assign roles through Accounts. Permission checks apply to pages, server actions, and API mutations; role changes take effect on the next server request, including existing sessions.
+
+Deploy the new application to all instances before assigning Editor or Viewer roles: older builds ignore `accessLevel` and continue applying the previous User permissions. Do not roll back to an older build while relying on Viewer restrictions.
+
 ### Decimal progress
 
 Physical accomplishment accepts 0–100 with up to two decimal places (for example, 42.75%). Before deploying this change, run `npm run db:upgrade-progress` against the target database, then build/deploy normally. This idempotent upgrade adds a nullable `DECIMAL(5,2)` column and a compatibility trigger; it does not replace the existing integer column or rewrite existing records.

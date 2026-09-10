@@ -1,3 +1,4 @@
+import { roleData, accessRole } from "@/lib/permissions";
 import { NextResponse } from "next/server";
 import { Prisma, UserRole } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
@@ -19,24 +20,33 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const body = await request.json().catch(() => null);
   const displayName = typeof body?.displayName === "string" ? body.displayName.trim() : "";
   const username = typeof body?.username === "string" ? body.username.trim().toLowerCase() : "";
-  const role = String(body?.role || existing.role) as UserRole;
-  const isActive = body?.isActive !== false;
+  // A pre-role-update browser tab only knows ADMIN/USER. Do not let its stale
+  // USER value overwrite a Viewer or Editor assignment.
+  if (body?.role === "USER" && existing.role === "USER" && existing.accessLevel != null) {
+    return NextResponse.json({ error: "Role settings have changed. Reload this page before saving." }, { status: 409 });
+  }
+  const permissions = roleData(body?.role ?? accessRole(existing));
+  const isActive = body?.isActive ?? existing.isActive;
+
+  if (typeof isActive !== "boolean") {
+    return NextResponse.json({ error: "Invalid account status." }, { status: 400 });
+  }
 
   if (!displayName || displayName.length > 100 || !validUsername(username)) {
     return NextResponse.json({ error: "Enter a valid name and username." }, { status: 400 });
   }
-  if (!Object.values(UserRole).includes(role)) {
+  if (!permissions) {
     return NextResponse.json({ error: "Invalid role." }, { status: 400 });
   }
 
-  if (id === admin.id && (role !== existing.role || !isActive)) {
+  if (id === admin.id && (accessRole(permissions) !== accessRole(existing) || !isActive)) {
     return NextResponse.json({ error: "You cannot deactivate or change the role of the account you are currently using." }, { status: 400 });
   }
 
   try {
     await prisma.user.update({
       where: { id },
-      data: { displayName, username, role, isActive },
+      data: { displayName, username, ...permissions, isActive },
     });
     return NextResponse.json({ ok: true });
   } catch (error) {

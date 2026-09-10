@@ -1,3 +1,4 @@
+import { canManageProjects } from "@/lib/permissions";
 import { projectProgress } from "@/lib/progress";
 import ListControls from "@/components/ListControls";
 import { pagination } from "@/lib/pagination";
@@ -99,7 +100,7 @@ export default async function ProjectPage({
           </div>
           <div className="pageActions">
             <a className="button secondary" href={`/api/projects/${project.id}/export`}>Export CSV</a>
-            {user.role === "ADMIN" ? <a className="button secondary" href={`/projects/${project.id}/edit`}>Edit project</a> : null}
+            {canManageProjects(user) ? <a className="button secondary" href={`/projects/${project.id}/edit`}>Edit project</a> : null}
           </div>
         </div>
 
@@ -131,7 +132,7 @@ export default async function ProjectPage({
           <ListControls page={page} total={total} placeholder="Find an item" />
           <ProjectItemList projectId={project.id} items={itemRows} />
 
-          {user.role === "ADMIN" ? (
+          {canManageProjects(user) ? (
             <div className="itemEntryStack section">
               <form className="card inlineForm" action={addItem}>
                 <div className="field"><label htmlFor="itemNumber">Item No.</label><input className="input" id="itemNumber" name="itemNumber" placeholder="e.g. 200" autoComplete="off" required /></div>

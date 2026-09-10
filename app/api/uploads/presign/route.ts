@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import crypto from "node:crypto";
 import path from "node:path";
 import { NextResponse } from "next/server";
@@ -12,6 +13,7 @@ const EXTENSIONS: Record<string, string> = { "image/jpeg": ".jpg", "image/png": 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!canEditTests(user)) return NextResponse.json({ error: "Editing access required." }, { status: 403 });
 
   const body = await request.json().catch(() => null);
   const testId = typeof body?.testId === "string" ? body.testId : "";

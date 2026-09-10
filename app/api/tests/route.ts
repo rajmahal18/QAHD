@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -6,6 +7,7 @@ import { parseTestInput } from "@/lib/test-validation";
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!canEditTests(user)) return NextResponse.json({ error: "Editing access required." }, { status: 403 });
 
   const body = await request.json().catch(() => null);
   let input;

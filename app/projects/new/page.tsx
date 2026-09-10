@@ -1,3 +1,4 @@
+import { canManageProjects } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import ProjectForm from "@/components/ProjectForm";
@@ -7,7 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 export default async function NewProjectPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") redirect("/projects");
+  if (!canManageProjects(user)) redirect("/projects");
   const { error = "" } = await searchParams;
 
   return (

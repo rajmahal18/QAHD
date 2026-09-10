@@ -1,3 +1,4 @@
+import { roleData } from "@/lib/permissions";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { Prisma, UserRole } from "@prisma/client";
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   const displayName = typeof body?.displayName === "string" ? body.displayName.trim() : "";
   const username = typeof body?.username === "string" ? body.username.trim().toLowerCase() : "";
   const password = typeof body?.password === "string" ? body.password : "";
-  const role = String(body?.role || UserRole.USER) as UserRole;
+  const permissions = roleData(body?.role ?? "ENCODER");
 
   if (!displayName || !username || !password) {
     return NextResponse.json({ error: "Name, username, and temporary password are required." }, { status: 400 });
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
   if (password.length < 10 || password.length > 256) {
     return NextResponse.json({ error: "Temporary password must be 10 to 256 characters." }, { status: 400 });
   }
-  if (!Object.values(UserRole).includes(role)) {
+  if (!permissions) {
     return NextResponse.json({ error: "Invalid role." }, { status: 400 });
   }
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
         displayName,
         username,
         passwordHash,
-        role,
+        ...permissions,
         isActive: true,
         mustChangePassword: true,
       },

@@ -27,6 +27,7 @@ export default async function ManageAccountPage({
       displayName: true,
       username: true,
       role: true,
+      accessLevel: true,
       isActive: true,
       mustChangePassword: true,
     },

@@ -1,5 +1,7 @@
 "use client";
 
+import RoleSelect from "@/components/RoleSelect";
+
 import PasswordInput from "@/components/PasswordInput";
 
 import { FormEvent, useState } from "react";
@@ -81,10 +83,7 @@ export default function AccountForm() {
         </div>
         <div className="field">
           <label htmlFor="role">Role</label>
-          <select className="input" id="role" name="role" defaultValue="USER">
-            <option value="USER">User</option>
-            <option value="ADMIN">Administrator</option>
-          </select>
+          <RoleSelect />
         </div>
         <div className="field">
           <label htmlFor="password">Temporary password</label>

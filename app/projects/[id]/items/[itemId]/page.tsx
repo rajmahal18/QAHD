@@ -1,3 +1,4 @@
+import { canManageProjects, canEditTests } from "@/lib/permissions";
 import { Prisma, TestResult } from "@prisma/client";
 import ListControls from "@/components/ListControls";
 import { pagination } from "@/lib/pagination";
@@ -90,8 +91,8 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
             <p>{item.project.name} · {item.project.location || "Location not set"}</p>
           </div>
           <div className="pageActions">
-            {user.role === "ADMIN" ? <a className="button secondary" href={`/projects/${item.project.id}/items/${item.id}/edit`}>Edit item</a> : null}
-            <a className="button" href={`/projects/${item.project.id}/items/${item.id}/tests/new`}>+ Add test</a>
+            {canManageProjects(user) ? <a className="button secondary" href={`/projects/${item.project.id}/items/${item.id}/edit`}>Edit item</a> : null}
+            {canEditTests(user) ? <a className="button" href={`/projects/${item.project.id}/items/${item.id}/tests/new`}>+ Add test</a> : null}
           </div>
         </div>
 

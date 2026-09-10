@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function AttachmentActions({ id }: { id: string }) {
+export default function AttachmentActions({ id, canRemove = false }: { id: string; canRemove?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,7 +24,7 @@ export default function AttachmentActions({ id }: { id: string }) {
   return (
     <div className="attachmentActions">
       <a className="button secondary small" href={`/api/attachments/${id}`} target="_blank" rel="noreferrer">View</a>
-      <button className="button ghost small" type="button" onClick={remove} disabled={busy}>{busy ? "Removing…" : "Remove"}</button>
+      {canRemove ? <button className="button ghost small" type="button" onClick={remove} disabled={busy}>{busy ? "Removing…" : "Remove"}</button> : null}
       {error ? <span className="attachmentError">{error}</span> : null}
     </div>
   );

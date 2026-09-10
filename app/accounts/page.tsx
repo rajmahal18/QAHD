@@ -1,9 +1,9 @@
+import { roleLabel } from "@/lib/permissions";
 import { UserRole } from "@prisma/client";
 import { redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { humanizeEnum } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +19,7 @@ export default async function AccountsPage() {
       displayName: true,
       username: true,
       role: true,
+      accessLevel: true,
       isActive: true,
       mustChangePassword: true,
     },
@@ -47,7 +48,7 @@ export default async function AccountsPage() {
               </div>
               <div className="accountRowStatus">
                 <span className={`badge ${account.isActive ? "ACTIVE" : "INACTIVE"}`}>{account.isActive ? "Active" : "Inactive"}</span>
-                <span className="badge roleBadge">{humanizeEnum(account.role)}</span>
+                <span className="badge roleBadge">{roleLabel(account)}</span>
                 {account.mustChangePassword ? <span className="badge PENDING">Password change</span> : null}
                 <span className="chevron" aria-hidden="true">›</span>
               </div>

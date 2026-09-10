@@ -79,6 +79,7 @@ export async function getCurrentUser() {
       username: true,
       displayName: true,
       role: true,
+      accessLevel: true,
       isActive: true,
       mustChangePassword: true,
     },

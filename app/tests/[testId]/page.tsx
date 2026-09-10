@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AttachmentActions from "@/components/AttachmentActions";
@@ -43,8 +44,8 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
           </div>
           <div className="pageActions">
             <span className={`badge ${test.result}`}>{humanizeEnum(test.result)}</span>
-            <a className="button secondary" href={`/tests/${test.id}/edit`}>Edit</a>
-            <a className="button" href={repeatHref}>Record again</a>
+            {canEditTests(user) ? <a className="button secondary" href={`/tests/${test.id}/edit`}>Edit</a> : null}
+            {canEditTests(user) ? <a className="button" href={repeatHref}>Record again</a> : null}
           </div>
         </div>
 
@@ -68,14 +69,14 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
               {test.attachments.map((attachment) => (
                 <div className="card attachmentRow" key={attachment.id}>
                   <div className="attachmentName"><strong>{attachment.originalName}</strong><span>{humanFileSize(attachment.fileSize)} · {attachment.mimeType === "application/pdf" ? "PDF" : "Image"}</span></div>
-                  <AttachmentActions id={attachment.id} />
+                  <AttachmentActions id={attachment.id} canRemove={canEditTests(user)} />
                 </div>
               ))}
             </div>
-          ) : <div className="card empty"><strong>No evidence uploaded.</strong>Add a photo or PDF below.</div>}
+          ) : <div className="card empty"><strong>No evidence uploaded.</strong>{canEditTests(user) ? "Add a photo or PDF below." : "No files recorded for this test."}</div>}
         </section>
 
-        <section className="section"><EvidenceUploader testId={test.id} /></section>
+        {canEditTests(user) ? <section className="section"><EvidenceUploader testId={test.id} /></section> : null}
       </main>
     </>
   );

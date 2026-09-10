@@ -1,3 +1,4 @@
+import { canManageProjects } from "@/lib/permissions";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import ItemForm from "@/components/ItemForm";
@@ -14,7 +15,7 @@ export default async function EditItemPage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") redirect("/projects");
+  if (!canManageProjects(user)) redirect("/projects");
 
   const { id, itemId } = await params;
   const { error = "" } = await searchParams;

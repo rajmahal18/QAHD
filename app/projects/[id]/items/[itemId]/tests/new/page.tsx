@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import TestForm from "@/components/TestForm";
@@ -14,6 +15,7 @@ export default async function NewTestPage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (!canEditTests(user)) redirect("/projects");
   const { id, itemId } = await params;
   const { repeat = "", saved = "" } = await searchParams;
 

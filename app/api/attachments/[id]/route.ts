@@ -1,3 +1,4 @@
+import { canEditTests } from "@/lib/permissions";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -22,6 +23,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  if (!canEditTests(user)) return NextResponse.json({ error: "Editing access required." }, { status: 403 });
 
   const { id } = await params;
   const attachment = await prisma.testAttachment.findUnique({ where: { id }, select: { id: true, objectKey: true } });

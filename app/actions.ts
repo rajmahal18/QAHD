@@ -1,5 +1,6 @@
 "use server";
 
+import { canManageProjects } from "@/lib/permissions";
 import { ProjectStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -7,10 +8,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseProgress, ProgressValidationError } from "@/lib/progress";
 
-async function requireAdmin() {
+async function requireProjectEditor() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "ADMIN") throw new Error("Admin access required.");
+  if (!canManageProjects(user)) throw new Error("Project editing access required.");
   return user;
 }
 
@@ -68,7 +69,7 @@ function duplicateMessage(error: unknown, fallback: string) {
 }
 
 export async function createProject(form: FormData) {
-  await requireAdmin();
+  await requireProjectEditor();
   let project;
   try {
     project = await prisma.project.create({ data: projectData(form) });
@@ -82,7 +83,7 @@ export async function createProject(form: FormData) {
 }
 
 export async function updateProject(projectId: string, form: FormData) {
-  await requireAdmin();
+  await requireProjectEditor();
   try {
     await prisma.project.update({ where: { id: projectId }, data: projectData(form) });
   } catch (error) {
@@ -97,7 +98,7 @@ export async function updateProject(projectId: string, form: FormData) {
 }
 
 export async function createItem(projectId: string, form: FormData) {
-  await requireAdmin();
+  await requireProjectEditor();
   const itemNumber = text(form, "itemNumber", true)!;
   const description = text(form, "description", true)!;
   let notice = "Item added.";
@@ -156,7 +157,7 @@ function parseBulkItems(raw: string) {
 }
 
 export async function createItemsBulk(projectId: string, form: FormData) {
-  await requireAdmin();
+  await requireProjectEditor();
   const raw = String(form.get("items") || "");
   const { rows, ignored } = parseBulkItems(raw);
   if (!rows.length) {
@@ -180,7 +181,7 @@ export async function createItemsBulk(projectId: string, form: FormData) {
 }
 
 export async function updateItem(projectId: string, itemId: string, form: FormData) {
-  await requireAdmin();
+  await requireProjectEditor();
   const itemNumber = text(form, "itemNumber", true)!;
   const description = text(form, "description", true)!;
 

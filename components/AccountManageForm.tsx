@@ -1,5 +1,8 @@
 "use client";
 
+import RoleSelect from "@/components/RoleSelect";
+import { accessRole } from "@/lib/permissions";
+
 import PasswordInput from "@/components/PasswordInput";
 
 import { FormEvent, useState } from "react";
@@ -9,6 +12,7 @@ type Account = {
   displayName: string;
   username: string;
   role: "ADMIN" | "USER";
+  accessLevel: string | null;
   isActive: boolean;
   mustChangePassword: boolean;
 };
@@ -31,7 +35,7 @@ export default function AccountManageForm({ account, isSelf }: { account: Accoun
       body: JSON.stringify({
         displayName: form.get("displayName"),
         username: form.get("username"),
-        role: isSelf ? account.role : form.get("role"),
+        role: isSelf ? accessRole(account) : form.get("role"),
         isActive: isSelf ? account.isActive : form.get("isActive") === "on",
       }),
     });
@@ -47,6 +51,7 @@ export default function AccountManageForm({ account, isSelf }: { account: Accoun
 
   async function resetPassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setError("");
     setNotice("");
     setResetBusy(true);
@@ -62,7 +67,7 @@ export default function AccountManageForm({ account, isSelf }: { account: Accoun
       setError(data.error || "Could not reset the password.");
       return;
     }
-    event.currentTarget.reset();
+    formElement.reset();
     setNotice("Temporary password saved. The user will be asked to change it after login.");
   }
 
@@ -84,10 +89,7 @@ export default function AccountManageForm({ account, isSelf }: { account: Accoun
           </div>
           <div className="field">
             <label htmlFor="role">Role</label>
-            <select className="input" id="role" name="role" defaultValue={account.role} disabled={isSelf}>
-              <option value="USER">User</option>
-              <option value="ADMIN">Administrator</option>
-            </select>
+            <RoleSelect defaultValue={accessRole(account)} disabled={isSelf} />
             {isSelf ? <span className="fieldHint">Your own role cannot be changed here.</span> : null}
           </div>
           <label className={`toggleRow full ${isSelf ? "disabledToggle" : ""}`}>
