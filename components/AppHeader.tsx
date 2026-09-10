@@ -18,15 +18,22 @@ export default async function AppHeader() {
             <small>Monitoring &amp; Evidence Registry</small>
           </span>
         </a>
-        <div className="userMenu">
-          <span className="userIdentity">
+
+        <details className="userDropdown">
+          <summary>
             <span className="userDot" aria-hidden="true" />
             <span className="userName">{user.displayName}</span>
-          </span>
-          <form action="/api/auth/logout" method="post">
-            <button className="button ghost small" type="submit">Logout</button>
-          </form>
-        </div>
+            <span className="userAccountLabel">Account</span>
+            <span className="menuChevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div className="userDropdownMenu">
+            <a href="/account">My account</a>
+            {user.role === "ADMIN" ? <a href="/accounts">Accounts</a> : null}
+            <form action="/api/auth/logout" method="post">
+              <button type="submit">Logout</button>
+            </form>
+          </div>
+        </details>
       </div>
     </header>
   );

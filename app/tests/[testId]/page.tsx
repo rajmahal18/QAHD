@@ -8,6 +8,10 @@ import { formatDate, humanFileSize, humanizeEnum } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
+function shownDate(value: Date | null) {
+  return value ? formatDate(value) : "—";
+}
+
 export default async function TestPage({ params }: { params: Promise<{ testId: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -23,6 +27,8 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
   if (!test) notFound();
   const itemHref = `/projects/${test.item.project.id}/items/${test.item.id}`;
   const repeatHref = `${itemHref}/tests/new?repeat=${encodeURIComponent(test.id)}`;
+  const primaryDate = test.dateTested || test.dateSubmitted || test.dateSampled || test.conductedAt;
+  const primaryLabel = test.dateTested ? "Tested" : test.dateSubmitted ? "Submitted" : test.dateSampled ? "Sampled" : "Recorded";
 
   return (
     <>
@@ -31,7 +37,7 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
         <a className="backLink" href={itemHref}>← Item {test.item.itemNumber}</a>
         <div className="pageTop">
           <div>
-            <div className="eyebrow">{formatDate(test.conductedAt)}</div>
+            <div className="eyebrow">{primaryLabel} {formatDate(primaryDate)}</div>
             <h1>{test.testName}</h1>
             <p>{test.item.project.projectCode} · {test.item.description}</p>
           </div>
@@ -43,8 +49,12 @@ export default async function TestPage({ params }: { params: Promise<{ testId: s
         </div>
 
         <div className="card infoCard">
-          <div className="infoGrid">
-            <div className="infoItem"><span>Date conducted</span><strong>{formatDate(test.conductedAt)}</strong></div>
+          <div className="testDateSummary">
+            <div className="infoItem"><span>Date Sampled</span><strong>{shownDate(test.dateSampled)}</strong></div>
+            <div className="infoItem"><span>Date Submitted</span><strong>{shownDate(test.dateSubmitted)}</strong></div>
+            <div className="infoItem"><span>Date Tested</span><strong>{shownDate(test.dateTested)}</strong></div>
+          </div>
+          <div className="infoGrid testMetaGrid">
             <div className="infoItem"><span>Recorded by</span><strong>{test.createdBy.displayName}</strong></div>
             <div className="infoItem"><span>Project location</span><strong>{test.item.project.location || "—"}</strong></div>
             <div className="infoItem fullInfo"><span>Remarks</span><strong>{test.remarks || "—"}</strong></div>

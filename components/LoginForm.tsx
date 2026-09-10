@@ -19,13 +19,13 @@ export default function LoginForm() {
     });
 
     setLoading(false);
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
       setError(data.error || "Unable to sign in.");
       return;
     }
 
-    window.location.href = "/projects";
+    window.location.href = data.mustChangePassword ? "/account?change=required" : "/projects";
   }
 
   return (

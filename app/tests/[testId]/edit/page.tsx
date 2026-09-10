@@ -38,7 +38,9 @@ export default async function EditTestPage({ params }: { params: Promise<{ testI
           suggestions={suggestions}
           defaults={{
             testName: test.testName,
-            conductedAt: dateInputValue(test.conductedAt),
+            dateSampled: test.dateSampled ? dateInputValue(test.dateSampled) : "",
+            dateSubmitted: test.dateSubmitted ? dateInputValue(test.dateSubmitted) : "",
+            dateTested: test.dateTested ? dateInputValue(test.dateTested) : (!test.dateSampled && !test.dateSubmitted ? dateInputValue(test.conductedAt) : ""),
             result: test.result,
             remarks: test.remarks || "",
           }}

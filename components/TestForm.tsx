@@ -5,7 +5,9 @@ import { uploadEvidence } from "@/components/EvidenceUploader";
 
 type Defaults = {
   testName?: string;
-  conductedAt?: string;
+  dateSampled?: string;
+  dateSubmitted?: string;
+  dateTested?: string;
   result?: "PENDING" | "PASSED" | "FAILED";
   remarks?: string;
 };
@@ -45,7 +47,9 @@ export default function TestForm({
     const payload = {
       itemId,
       testName: form.get("testName"),
-      conductedAt: form.get("conductedAt"),
+      dateSampled: form.get("dateSampled"),
+      dateSubmitted: form.get("dateSubmitted"),
+      dateTested: form.get("dateTested"),
       result: form.get("result"),
       remarks: form.get("remarks"),
     };
@@ -109,10 +113,23 @@ export default function TestForm({
             </>
           ) : null}
         </div>
-        <div className="field">
-          <label htmlFor="conductedAt">Date conducted</label>
-          <input className="input" id="conductedAt" name="conductedAt" type="date" defaultValue={defaults.conductedAt || ""} required />
+
+        <div className="dateFields full">
+          <div className="field">
+            <label htmlFor="dateSampled">Date Sampled</label>
+            <input className="input" id="dateSampled" name="dateSampled" type="date" defaultValue={defaults.dateSampled || ""} />
+          </div>
+          <div className="field">
+            <label htmlFor="dateSubmitted">Date Submitted</label>
+            <input className="input" id="dateSubmitted" name="dateSubmitted" type="date" defaultValue={defaults.dateSubmitted || ""} />
+          </div>
+          <div className="field">
+            <label htmlFor="dateTested">Date Tested</label>
+            <input className="input" id="dateTested" name="dateTested" type="date" defaultValue={defaults.dateTested || ""} />
+          </div>
+          <span className="fieldHint dateHint">Enter what is available. Date Tested is required once the result is Passed or Failed.</span>
         </div>
+
         <div className="field">
           <label htmlFor="result">Result</label>
           <select className="input" id="result" name="result" defaultValue={defaults.result || "PENDING"}>

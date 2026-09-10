@@ -451,3 +451,173 @@ input[type="file"]::file-selector-button {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* Project location — compact map picker, not a second workflow */
+.locationField { min-width: 0; }
+.locationTools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 2px; }
+.coordinateReadout { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.textButton { border: 0; padding: 4px 0; background: transparent; color: var(--brand-blue); font-size: 11px; font-weight: 750; cursor: pointer; }
+.textButton:hover { text-decoration: underline; text-underline-offset: 2px; }
+.locationPanel { margin-top: 5px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-muted); }
+.locationPanelTop { display: flex; align-items: center; gap: 8px; padding: 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.locationSearch { min-width: 0; flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+.locationResults { display: grid; border-bottom: 1px solid var(--border); background: var(--surface); }
+.locationResult { width: 100%; border: 0; border-bottom: 1px solid var(--border); padding: 9px 11px; background: var(--surface); color: var(--text); text-align: left; font-size: 11px; line-height: 1.4; cursor: pointer; }
+.locationResult:last-child { border-bottom: 0; }
+.locationResult:hover { background: var(--surface-blue); }
+.locationMessage { padding: 8px 11px; border-bottom: 1px solid var(--border); background: var(--warning-bg); color: var(--warning); font-size: 11px; }
+.locationMap { width: 100%; height: 320px; background: #e6ebef; }
+.mapHint { margin: 0; padding: 8px 11px; color: var(--muted); font-size: 10px; background: var(--surface); border-top: 1px solid var(--border); }
+.projectLocationLine { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 12px; max-width: 760px; margin-top: 9px; color: var(--muted); font-size: 14px; }
+.mapLink { color: var(--brand-blue); font-size: 11px; font-weight: 760; white-space: nowrap; }
+.mapLink:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Keep third-party Leaflet controls visually restrained inside the app. */
+.locationMap .leaflet-control-container { font-family: inherit; }
+.locationMap .leaflet-control-attribution { font-size: 9px; }
+
+@media (max-width: 700px) {
+  .locationPanelTop { align-items: stretch; flex-direction: column; }
+  .locationSearch { grid-template-columns: minmax(0, 1fr) auto; width: 100%; }
+  .locationPanelTop > .button { width: 100%; }
+  .locationMap { height: 290px; }
+  .projectLocationLine { font-size: 13px; }
+}
+
+@media (max-width: 430px) {
+  .locationSearch { grid-template-columns: 1fr; }
+  .locationSearch .button { width: 100%; }
+  .locationMap { height: 260px; }
+}
+
+/* Account menu — compact so the header stays usable on small screens. */
+.userDropdown { position: relative; flex: 0 0 auto; }
+.userDropdown > summary {
+  list-style: none;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 680;
+  cursor: pointer;
+  user-select: none;
+}
+.userDropdown > summary::-webkit-details-marker { display: none; }
+.userDropdown > summary:hover, .userDropdown[open] > summary { background: var(--surface-muted); border-color: var(--border); color: var(--text); }
+.userAccountLabel { display: none; }
+.menuChevron { color: #8c9bab; font-size: 13px; line-height: 1; }
+.userDropdownMenu {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 50;
+  width: 178px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 14px 34px rgba(15, 35, 56, .12);
+}
+.userDropdownMenu a, .userDropdownMenu button {
+  width: 100%;
+  min-height: 39px;
+  display: flex;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 11px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 680;
+  cursor: pointer;
+}
+.userDropdownMenu form:last-child button, .userDropdownMenu > *:last-child { border-bottom: 0; }
+.userDropdownMenu a:hover, .userDropdownMenu button:hover { background: var(--surface-blue); color: var(--brand-navy); }
+
+/* Three explicit material-testing dates without turning the form into a spreadsheet. */
+.dateFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+.dateHint { grid-column: 1 / -1; }
+.testDateSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding-bottom: 17px;
+  margin-bottom: 17px;
+  border-bottom: 1px solid var(--border);
+}
+.testDateSummary .infoItem {
+  min-width: 0;
+  padding-left: 10px;
+  border-left: 2px solid #d8e2eb;
+}
+.testDateSummary .infoItem:last-child { border-left-color: var(--brand-gold); }
+.testMetaGrid { margin-top: 0; }
+
+/* Accounts — deliberately list-first, no dashboard widgets. */
+.narrowShell { width: min(calc(100% - 40px), 760px); }
+.accountList { gap: 8px; }
+.accountRow {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 16px;
+  transition: border-color .14s ease, background .14s ease, box-shadow .14s ease;
+}
+.accountRow:hover { border-color: #b9c5cf; background: #fff; box-shadow: var(--shadow-soft); }
+.accountRowStatus { min-width: 0; display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+.badge.ACTIVE { background: var(--success-bg); color: var(--success); }
+.badge.INACTIVE { background: #eef1f4; color: var(--muted); }
+.roleBadge { background: var(--surface-blue); color: var(--brand-navy); }
+.accountPanels { display: grid; gap: 14px; }
+.accountPanels > .successNotice { margin-bottom: 0; }
+.compactSectionHeader { align-items: start; margin-bottom: 18px; }
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  background: var(--surface-muted);
+  cursor: pointer;
+}
+.toggleRow input { width: 16px; height: 16px; margin: 0; accent-color: var(--brand-navy); }
+.toggleRow span { min-width: 0; }
+.toggleRow strong { display: block; color: var(--text); font-size: 12px; }
+.toggleRow small { display: block; margin-top: 1px; color: var(--muted); font-size: 10px; }
+.disabledToggle { opacity: .65; cursor: default; }
+.passwordNotice { display: grid; gap: 2px; margin-bottom: 18px; border-color: #ead49b; background: var(--warning-bg); color: var(--warning); }
+.passwordNotice strong { font-size: 12px; }
+.passwordNotice span { font-size: 11px; }
+
+@media (max-width: 700px) {
+  .userDropdown .userName { display: none; }
+  .userDropdown .userAccountLabel { display: inline; }
+  .userDropdown .userDot { display: inline-block; }
+  .narrowShell { width: min(calc(100% - 24px), 760px); }
+  .dateFields, .testDateSummary { grid-template-columns: 1fr; }
+  .dateHint { grid-column: auto; }
+  .accountRow { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .accountRowStatus { width: 100%; justify-content: flex-start; }
+  .accountRowStatus .chevron { margin-left: auto; }
+}
+
+.selfPasswordNote { padding: 14px 16px; color: var(--muted); font-size: 12px; }

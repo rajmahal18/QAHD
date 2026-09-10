@@ -1,4 +1,5 @@
 import { Project, ProjectStatus } from "@prisma/client";
+import LocationPicker from "@/components/LocationPicker";
 
 export default function ProjectForm({
   action,
@@ -29,10 +30,11 @@ export default function ProjectForm({
           <label htmlFor="name">Project name</label>
           <input className="input" id="name" name="name" defaultValue={project?.name} autoComplete="off" required />
         </div>
-        <div className="field full">
-          <label htmlFor="location">Location</label>
-          <input className="input" id="location" name="location" defaultValue={project?.location || ""} placeholder="e.g. Datu Odin Sinsuat, Maguindanao del Norte" autoComplete="off" required />
-        </div>
+        <LocationPicker
+          initialLocation={project?.location || ""}
+          initialLatitude={project?.latitude ?? null}
+          initialLongitude={project?.longitude ?? null}
+        />
         <div className="field full">
           <label htmlFor="contractor">Contractor</label>
           <input className="input" id="contractor" name="contractor" defaultValue={project?.contractor} autoComplete="off" required />

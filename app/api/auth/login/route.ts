@@ -15,12 +15,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid username or password." }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
+  });
   const valid = user ? await bcrypt.compare(password, user.passwordHash) : false;
   if (!user || !valid) {
     return NextResponse.json({ error: "Invalid username or password." }, { status: 401 });
   }
+  if (!user.isActive) {
+    return NextResponse.json({ error: "This account is inactive. Contact the administrator." }, { status: 403 });
+  }
 
   await createSession(user.id);
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, mustChangePassword: user.mustChangePassword });
 }

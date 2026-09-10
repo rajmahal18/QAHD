@@ -19,6 +19,17 @@ function text(form: FormData, key: string, required = false) {
   return value || null;
 }
 
+
+function optionalCoordinate(form: FormData, key: string, min: number, max: number) {
+  const raw = String(form.get(key) || "").trim();
+  if (!raw) return null;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < min || value > max) {
+    throw new Error(`Invalid ${key}.`);
+  }
+  return value;
+}
+
 function accomplishment(form: FormData) {
   const value = Number(form.get("physicalAccomplishment") || 0);
   if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error("Physical accomplishment must be 0 to 100.");
@@ -32,10 +43,18 @@ function status(form: FormData): ProjectStatus {
 }
 
 function projectData(form: FormData) {
+  const latitude = optionalCoordinate(form, "latitude", -90, 90);
+  const longitude = optionalCoordinate(form, "longitude", -180, 180);
+  if ((latitude === null) !== (longitude === null)) {
+    throw new Error("Latitude and longitude must be set together.");
+  }
+
   return {
     projectCode: text(form, "projectCode", true)!,
     name: text(form, "name", true)!,
     location: text(form, "location", true)!,
+    latitude,
+    longitude,
     contractor: text(form, "contractor", true)!,
     projectEngineer: text(form, "projectEngineer"),
     projectInspector: text(form, "projectInspector"),

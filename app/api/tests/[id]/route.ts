@@ -28,6 +28,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       data: {
         testName: input.testName,
         conductedAt: input.conductedAt,
+        dateSampled: input.dateSampled,
+        dateSubmitted: input.dateSubmitted,
+        dateTested: input.dateTested,
         result: input.result,
         remarks: input.remarks,
       },

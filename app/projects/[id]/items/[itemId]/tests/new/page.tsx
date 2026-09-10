@@ -50,7 +50,7 @@ export default async function NewTestPage({
           cancelHref={back}
           newTestHref={newTestHref}
           suggestions={suggestions}
-          defaults={{ testName: repeatName, conductedAt: todayInManila(), result: "PENDING" }}
+          defaults={{ testName: repeatName, dateSampled: todayInManila(), result: "PENDING" }}
           successMessage={saved ? "Test saved. Ready for the next one." : undefined}
         />
       </main>

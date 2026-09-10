@@ -80,7 +80,21 @@ export default async function ProjectPage({
           <div>
             <div className="eyebrow">{project.projectCode}</div>
             <h1>{project.name}</h1>
-            <p>{project.location || "Location not set"} · {project.contractor}</p>
+            <div className="projectLocationLine">
+              <span>{project.location || "Location not set"} · {project.contractor}</span>
+              {project.location ? (
+                <a
+                  className="mapLink"
+                  href={project.latitude !== null && project.longitude !== null
+                    ? `https://www.google.com/maps/search/?api=1&query=${project.latitude},${project.longitude}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(project.location)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in Google Maps ↗
+                </a>
+              ) : null}
+            </div>
           </div>
           <div className="pageActions">
             <a className="button secondary" href={`/api/projects/${project.id}/export`}>Export CSV</a>
