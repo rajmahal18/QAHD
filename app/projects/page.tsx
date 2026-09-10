@@ -1,3 +1,5 @@
+import ListControls from "@/components/ListControls";
+import { pagination } from "@/lib/pagination";
 import { Prisma, ProjectStatus } from "@prisma/client";
 import { redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
@@ -10,11 +12,11 @@ export const dynamic = "force-dynamic";
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const { q = "", status = "" } = await searchParams;
+  const { q = "", status = "", page: requestedPage } = await searchParams;
   const query = q.trim();
   const validStatus = Object.values(ProjectStatus).includes(status as ProjectStatus) ? (status as ProjectStatus) : undefined;
 
@@ -33,9 +35,11 @@ export default async function ProjectsPage({
   }
   if (validStatus) where.status = validStatus;
 
+  const total = await prisma.project.count({ where });
+  const { page, skip, take } = pagination(requestedPage, total);
   const projects = await prisma.project.findMany({
-    where,
-    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+    where, skip, take,
+    orderBy: [{ status: "asc" }, { updatedAt: "desc" }, { id: "asc" }],
     include: { _count: { select: { items: true } } },
   });
 
@@ -52,25 +56,9 @@ export default async function ProjectsPage({
           {user.role === "ADMIN" ? <a className="button" href="/projects/new">+ Add project</a> : null}
         </div>
 
-        <form className="searchBar projectSearch" method="get">
-          <input
-            className="input"
-            name="q"
-            defaultValue={query}
-            placeholder="Search project, location, contractor, or staff"
-            aria-label="Search projects"
-          />
-          <select className="input statusFilter" name="status" defaultValue={validStatus || ""} aria-label="Filter project status">
-            <option value="">All statuses</option>
-            <option value="ONGOING">Ongoing</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="SUSPENDED">Suspended</option>
-          </select>
-          <div className="filterActions">
-            <button className="button secondary" type="submit">Apply</button>
-            {query || validStatus ? <a className="button ghost" href="/projects">Clear</a> : null}
-          </div>
-        </form>
+        <ListControls page={page} total={total} placeholder="Search project, location, contractor, or staff" filter={{ name: "status", label: "Filter project status", options: [
+          { value: "", label: "All statuses" }, { value: "ONGOING", label: "Ongoing" }, { value: "COMPLETED", label: "Completed" }, { value: "SUSPENDED", label: "Suspended" },
+        ] }} />
 
         {projects.length ? (
           <div className="list">

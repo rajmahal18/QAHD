@@ -1,3 +1,5 @@
+import ListControls from "@/components/ListControls";
+import { pagination } from "@/lib/pagination";
 import { Prisma, TestResult } from "@prisma/client";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
@@ -14,27 +16,32 @@ export default async function ProjectPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ notice?: string }>;
+  searchParams: Promise<{ notice?: string; q?: string; page?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const { id } = await params;
-  const { notice = "" } = await searchParams;
+  const { notice = "", q = "", page: requestedPage } = await searchParams;
 
   const project = await prisma.project.findUnique({
     where: { id },
-    include: {
-      items: {
-        orderBy: { itemNumber: "asc" },
-        include: {
-          _count: { select: { tests: true } },
-          tests: { orderBy: [{ conductedAt: "desc" }, { createdAt: "desc" }], take: 1, select: { conductedAt: true } },
-        },
-      },
-    },
   });
   if (!project) notFound();
 
+  const where: Prisma.ProjectItemWhereInput = { projectId: id };
+  if (q.trim()) where.OR = [
+    { itemNumber: { contains: q.trim(), mode: "insensitive" } },
+    { description: { contains: q.trim(), mode: "insensitive" } },
+  ];
+  const total = await prisma.projectItem.count({ where });
+  const { page, skip, take } = pagination(requestedPage, total);
+  const items = await prisma.projectItem.findMany({
+    where, skip, take, orderBy: [{ itemNumber: "asc" }, { id: "asc" }],
+    select: { id: true, itemNumber: true, description: true,
+      _count: { select: { tests: true } },
+      tests: { orderBy: [{ conductedAt: "desc" }, { createdAt: "desc" }], take: 1, select: { conductedAt: true } },
+    },
+  });
   const testWhere: Prisma.TestWhereInput = { item: { projectId: project.id } };
   const [totalTests, failedTests, pendingTests, attentionTests] = await Promise.all([
     prisma.test.count({ where: testWhere }),
@@ -56,7 +63,7 @@ export default async function ProjectPage({
 
   const addItem = createItem.bind(null, project.id);
   const addItemsBulk = createItemsBulk.bind(null, project.id);
-  const itemRows = project.items.map((item) => ({
+  const itemRows = items.map((item) => ({
     id: item.id,
     itemNumber: item.itemNumber,
     description: item.description,
@@ -106,6 +113,7 @@ export default async function ProjectPage({
 
         <section className="section">
           <div className="sectionHeader"><div><h2>Items</h2><p>Open an item to record or review its tests.</p></div></div>
+          <ListControls page={page} total={total} placeholder="Find an item" />
           <ProjectItemList projectId={project.id} items={itemRows} />
 
           {user.role === "ADMIN" ? (

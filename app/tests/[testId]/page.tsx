@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/components/AppHeader";
 import AttachmentActions from "@/components/AttachmentActions";
-import EvidenceUploader from "@/components/EvidenceUploader";
+import EvidenceUploader from "@/components/LazyEvidenceUploader";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDate, humanFileSize, humanizeEnum } from "@/lib/format";

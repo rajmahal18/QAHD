@@ -1,7 +1,3 @@
-"use client";
-
-import { useMemo, useState } from "react";
-
 type Item = {
   id: string;
   itemNumber: string;
@@ -11,32 +7,11 @@ type Item = {
 };
 
 export default function ProjectItemList({ projectId, items }: { projectId: string; items: Item[] }) {
-  const [query, setQuery] = useState("");
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((item) => `${item.itemNumber} ${item.description}`.toLowerCase().includes(q));
-  }, [items, query]);
-
-  if (!items.length) return <div className="card empty"><strong>No items yet.</strong>Add a project item before recording tests.</div>;
-
   return (
     <>
-      {items.length >= 5 ? (
-        <div className="compactSearch">
-          <input
-            className="input"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Find an item"
-            aria-label="Find an item"
-          />
-          {query ? <span className="searchCount">{filtered.length} found</span> : null}
-        </div>
-      ) : null}
-      {filtered.length ? (
+      {items.length ? (
         <div className="list">
-          {filtered.map((item) => (
+          {items.map((item) => (
             <a className="card itemRow" href={`/projects/${projectId}/items/${item.id}`} key={item.id}>
               <div className="rowTop">
                 <div className="rowTitle"><strong>Item {item.itemNumber}</strong><span>{item.description}</span></div>

@@ -330,6 +330,16 @@ input[type="file"]::file-selector-button {
 .fullInfo { grid-column: 1 / -1; }
 .firstSection { margin-top: 18px; }
 
+.autoFilters { display: flex; gap: 8px; flex-wrap: wrap; }
+.autoFilters input { flex: 1 1 260px; min-width: 0; }
+.autoFilters select { flex: 0 1 180px; min-width: 0; }
+.pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0; color: var(--muted); font-size: 12px; }
+.pagination nav { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.pagination button:disabled { opacity: .5; cursor: default; }
+@media (max-width: 700px) {
+  .autoFilters input, .autoFilters select { flex-basis: 100%; width: 100%; }
+  .pagination nav { width: 100%; justify-content: space-between; }
+}
 .projectSearch { display: grid; grid-template-columns: minmax(0, 1fr) 170px auto; align-items: stretch; }
 .projectSearch .button { white-space: nowrap; }
 .filterActions { display: flex; gap: 8px; }
